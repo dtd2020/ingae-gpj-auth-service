@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  maximum:
+    token:
+      expiration: 5
+  jwt:
+    secret-key: BJmThXOyoUK8cqS+9F9xIfF0exOYjNc+BAQFJvr3UpCDu+oO6MHEpSmroIqTuUjF
+  flyway:
+    table: auth_flyway_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: db/migration
