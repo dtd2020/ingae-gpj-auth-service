@@ -11,8 +11,8 @@ spring:
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/gpj
     username: root
-    password: password
-    
+    password: mysql
+
   jpa:
     show-sql: true
     hibernate:
@@ -24,8 +24,9 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
     locations: db/migration
-  jwt:
-    secret-key: BJmThXOyoUK8cqS+9F9xIfF0exOYjNc+BAQFJvr3UpCDu+oO6MHEpSmroIqTuUjF
-  maximum:
-    token:
-      expiration: 15
+jwt:
+  secret:
+    key: BJmThXOyoUK8cqS+9F9xIfF0exOYjNc+BAQFJvr3UpCDu+oO6MHEpSmroIqTuUjF
+maximum:
+  token:
+    expiration: 15

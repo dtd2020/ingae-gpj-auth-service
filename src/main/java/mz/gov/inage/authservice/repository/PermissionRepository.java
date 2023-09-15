@@ -9,6 +9,6 @@ import java.util.Set;
 
 public interface PermissionRepository extends JpaRepository<PermissionEntity, Long> {
 
-    @Query("SELECT CASE WHEN COUNT(u) = :count THEN true ELSE false END FROM User u WHERE u.id IN :ids")
+    @Query("SELECT CASE WHEN COUNT(u) = :count THEN true ELSE false END FROM PermissionEntity u WHERE u.id IN :ids")
     boolean existByIds(@Param("ids") Set<Long> ids, @Param("count") Long count);
 }

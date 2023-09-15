@@ -9,6 +9,7 @@ import mz.gov.inage.authservice.dto.CreateUserRequest;
 import mz.gov.inage.authservice.dto.UserResponseData;
 import mz.gov.inage.authservice.exceptions.BusinessException;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -18,13 +19,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(properties = "spring.config.name=application-integration")
-@RequiredArgsConstructor
 public class UserServiceTest {
 
-    private final  IUserService userService;
-    private final TestHelper testHelper;
-    private final  UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private  IUserService userService;
+    @Autowired
+    private  TestHelper testHelper;
+    @Autowired
+    private   UserRepository userRepository;
+    @Autowired
+    private  BCryptPasswordEncoder passwordEncoder;
 
     @Test
     public void testCreateUser_Success() throws BusinessException {

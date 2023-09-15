@@ -6,7 +6,7 @@ import mz.gov.inage.authservice.dto.EditPermissionRequest;
 import mz.gov.inage.authservice.dto.PermissionResponseData;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PermissionMapper {
     PermissionResponseData toDto(PermissionEntity entity);
 
