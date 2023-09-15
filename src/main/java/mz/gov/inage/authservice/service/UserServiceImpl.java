@@ -24,7 +24,6 @@ import javax.persistence.EntityNotFoundException;
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
 	private final UserRepository userRepository;
-	private final UserMapper userMapper;
 	private final UserValidator userValidator;
 
 	private final ProfileRepository profileRepository;
@@ -37,15 +36,8 @@ public class UserServiceImpl implements IUserService {
 
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		String hashedPassword = encoder.encode(userRequest.getPassword());
-
-		var user= UserEntity.builder()
-				.username(userRequest.getUsername())
-				.password(hashedPassword)
-				.device(userRequest.getDevice())
-				.email(userRequest.getEmail())
-				.mobile(userRequest.getMobile())
-				.build();
-
+		var user=UserMapper.toEntity(userRequest);
+		user.setPassword(hashedPassword);
 		userRepository.save(user);
 		userRequest.getPermissions().stream().forEach(permissionId->{
 			UserPermissionEntity userPermissionEntity=new UserPermissionEntity();
@@ -53,7 +45,7 @@ public class UserServiceImpl implements IUserService {
 			userPermissionEntity.setPermissionId(permissionId);
 		});
 
-		return userMapper.toDto(user);
+		return UserMapper.toDto(user);
 	}
 
 
@@ -65,7 +57,7 @@ public class UserServiceImpl implements IUserService {
 				.orElseThrow(()->new EntityNotFoundException("No user found by the given Id"));
 		user.updateFields(userRequest);
 		userRepository.save(user);
-		return userMapper.toDto(user);
+		return UserMapper.toDto(user);
 	}
 
 	@Override
