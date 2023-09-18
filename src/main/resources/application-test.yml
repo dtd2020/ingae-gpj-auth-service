@@ -1,6 +1,32 @@
+server:
+  port: 8085
+  servlet:
+    context-path: /v1/auth-service
+    
+    
 spring:
+  application:
+    name: GPJ-AUTH-SERVICE
+    
   datasource:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/gpj_test
+    username: root
+    password: mysql
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.MySQL5Dialect
+
+  flyway:
+    table: auth_flyway_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: db/migration
+jwt:
+  secret:
+    key: BJmThXOyoUK8cqS+9F9xIfF0exOYjNc+BAQFJvr3UpCDu+oO6MHEpSmroIqTuUjF
+maximum:
+  token:
+    expiration: 15

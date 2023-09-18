@@ -2,6 +2,7 @@ package mz.gov.inage.authservice.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,7 +18,8 @@ public class LifeCycleEntity {
     private Long id;
 
     @Column(name = "ACTIVE", nullable = false)
-    private boolean active=true;
+    @Type(type = "org.hibernate.type.NumericBooleanType")
+    private Boolean active=true;
 
     @Column(name = "CREATED_AT", nullable = false)
     private LocalDateTime createdAt;
