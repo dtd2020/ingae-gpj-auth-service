@@ -27,7 +27,6 @@ public class UserServiceImpl implements IUserService {
 	private final UserValidator userValidator;
 
 	private final ProfileRepository profileRepository;
-	private final ProfileMapper profileMapper;
 
 	@Override
 	public UserResponseData createUser(CreateUserRequest userRequest) throws BusinessException {
@@ -39,11 +38,13 @@ public class UserServiceImpl implements IUserService {
 		var user=UserMapper.toEntity(userRequest);
 		user.setPassword(hashedPassword);
 		userRepository.save(user);
-		userRequest.getPermissions().stream().forEach(permissionId->{
-			UserPermissionEntity userPermissionEntity=new UserPermissionEntity();
-			userPermissionEntity.setUser(user);
-			userPermissionEntity.setPermissionId(permissionId);
-		});
+		if(userRequest.getPermissions()!=null && !userRequest.getPermissions().isEmpty()){
+			userRequest.getPermissions().stream().forEach(permissionId->{
+				UserPermissionEntity userPermissionEntity=new UserPermissionEntity();
+				userPermissionEntity.setUser(user);
+				userPermissionEntity.setPermissionId(permissionId);
+			});
+		}
 
 		return UserMapper.toDto(user);
 	}
@@ -82,7 +83,7 @@ public class UserServiceImpl implements IUserService {
 		profileEntity.setDescription(profileRequest.getDescription());
 		profileRepository.save(profileEntity);
 
-		return profileMapper.toDto(profileEntity);
+		return ProfileMapper.toDto(profileEntity);
 	}
 
 	@Override
@@ -92,7 +93,7 @@ public class UserServiceImpl implements IUserService {
 		profile.setDescription(profileRequest.getDescription());
 		profile.setCode(profileRequest.getCode());
 		profileRepository.save(profile);
-		return profileMapper.toDto(profile);
+		return ProfileMapper.toDto(profile);
 	}
 
 	@Override

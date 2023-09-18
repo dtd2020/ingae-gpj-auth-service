@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Data
-@Table(name = "USER_PROFILE")
+@Table(name = "PROFILE_PERMISSION")
 public class ProfilePermissionEntity extends LifeCycleEntity {
 
     @Column(name = "PROFILE_ID", nullable = false)
