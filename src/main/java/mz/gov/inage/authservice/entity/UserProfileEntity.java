@@ -18,7 +18,7 @@ import javax.persistence.Table;
 @Table(name = "USER_PROFILE")
 public class UserProfileEntity extends LifeCycleEntity {
 
-    @JoinColumn(name = "PROFILE_ID",nullable = false)
+    @JoinColumn(name = "PROFILE_ID", nullable = false)
     @ManyToOne
     private ProfileEntity profile;
 

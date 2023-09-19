@@ -1,5 +1,6 @@
 package mz.gov.inage.authservice.config;
 
+import mz.gov.inage.authservice.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,12 +19,11 @@ import mz.gov.inage.authservice.repository.UserRepository;
 public class ApplicationConfig {
 
 	@Autowired
-	UserRepository userRepository;
+	private UserRepository userRepository;
 
 	@Bean
 	public UserDetailsService userDetailsService() {
-		return username -> userRepository.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+		return new CustomUserDetailsService(userRepository);
 	}
 
 	@Bean

@@ -1,4 +1,4 @@
-package mz.gov.inage.authservice.config;
+package mz.gov.inage.authservice.service.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

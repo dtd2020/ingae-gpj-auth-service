@@ -1,7 +1,7 @@
 package mz.gov.inage.authservice.service;
 
 import lombok.RequiredArgsConstructor;
-import mz.gov.inage.authservice.config.JwtService;
+import mz.gov.inage.authservice.service.jwt.JwtService;
 import mz.gov.inage.authservice.entity.PasswordResetTokenEntity;
 import mz.gov.inage.authservice.repository.PasswordResetTokenRepository;
 import mz.gov.inage.authservice.repository.UserRepository;
@@ -55,7 +55,7 @@ public class AuthenticationService {
 		var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
 		// Validate the reset token
-		if (!isValidResetToken(changePasswordRequest.getResetToken())) {
+		if (!resetTokenRepository.findLastUnexpiredTokenByUser(userId).isPresent()) {
 			throw  new BusinessException("Invalid or expired token.");
 		}
 
@@ -108,13 +108,4 @@ public class AuthenticationService {
 		return UUID.randomUUID().toString();
 	}
 
-	private boolean isValidResetToken(String resetToken) {
-		var token = resetTokenRepository.findByToken(resetToken);
-
-		if (!token.isPresent() || token.get().isExpired()) {
-			return false;
-		}
-
-		return true;
-	}
 }

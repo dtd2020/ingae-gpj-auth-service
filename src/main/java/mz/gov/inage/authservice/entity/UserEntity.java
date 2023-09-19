@@ -1,5 +1,22 @@
 package mz.gov.inage.authservice.entity;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import mz.gov.inage.authservice.dto.EditUserRequest;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
@@ -7,21 +24,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import mz.gov.inage.authservice.dto.EditUserRequest;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "USER")
@@ -54,7 +56,9 @@ public class UserEntity extends LifeCycleEntity implements UserDetails {
 	@Column(name = "PASSWORD_EXPIRATION_DATE")
 	private LocalDateTime passwordExpirationDate;
 
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+	@Getter(value=AccessLevel.NONE)
+	@Setter(value= AccessLevel.NONE)
 	private Set<UserProfileEntity> roles;
 
 	@Override
@@ -67,11 +71,19 @@ public class UserEntity extends LifeCycleEntity implements UserDetails {
 		return this.password;
 	}
 
+	public Set<ProfileEntity> getRoles() {
+		return roles.stream()
+				.map(UserProfileEntity::getProfile)
+				.collect(Collectors.toSet());
+	}
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return roles.stream().map(role->new SimpleGrantedAuthority(role.getProfile().getCode()))
+		return roles.stream()
+				.map(role -> new SimpleGrantedAuthority("ROLE_" + role.getProfile().getCode()))
 				.collect(Collectors.toList());
 	}
+
 
 	@Override
 	public boolean isAccountNonExpired() {
