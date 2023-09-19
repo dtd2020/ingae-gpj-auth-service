@@ -15,7 +15,9 @@ import mz.gov.inage.authservice.dto.EditUserRequest;
 import mz.gov.inage.authservice.dto.ProfileResponseData;
 import mz.gov.inage.authservice.dto.UserResponseData;
 import mz.gov.inage.authservice.exceptions.BusinessException;
+import mz.gov.inage.authservice.security.UserSecurityHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -28,15 +30,17 @@ public class UserServiceImpl implements IUserService {
 
 	private final ProfileRepository profileRepository;
 
+	private final PasswordEncoder passwordEncoder;
+
 	@Override
 	public UserResponseData createUser(CreateUserRequest userRequest) throws BusinessException {
 
 		userValidator.validateCreateUser(userRequest);
 
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		String hashedPassword = encoder.encode(userRequest.getPassword());
+		String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
 		var user=UserMapper.toEntity(userRequest);
 		user.setPassword(hashedPassword);
+		user.setCreatedBy(UserSecurityHolder.getUserId());
 		userRepository.save(user);
 		if(userRequest.getPermissions()!=null && !userRequest.getPermissions().isEmpty()){
 			userRequest.getPermissions().stream().forEach(permissionId->{
@@ -57,6 +61,7 @@ public class UserServiceImpl implements IUserService {
 		var user =userRepository.findById(userId)
 				.orElseThrow(()->new EntityNotFoundException("No user found by the given Id"));
 		user.updateFields(userRequest);
+		user.setUpdatedBy(UserSecurityHolder.getUserId());
 		userRepository.save(user);
 		return UserMapper.toDto(user);
 	}
@@ -66,6 +71,7 @@ public class UserServiceImpl implements IUserService {
 		var user=userRepository.findById(userId)
 				.orElseThrow(()->new EntityNotFoundException("No user found by the given Id"));
 		user.setActive(false);
+		user.setUpdatedBy(UserSecurityHolder.getUserId());
 		userRepository.save(user);
 	}
 
@@ -81,6 +87,7 @@ public class UserServiceImpl implements IUserService {
 		ProfileEntity profileEntity= new ProfileEntity();
 		profileEntity.setCode(profileRequest.getCode());
 		profileEntity.setDescription(profileRequest.getDescription());
+		profileEntity.setCreatedBy(UserSecurityHolder.getUserId());
 		profileRepository.save(profileEntity);
 
 		return ProfileMapper.toDto(profileEntity);
@@ -92,6 +99,7 @@ public class UserServiceImpl implements IUserService {
 				.orElseThrow(()->new EntityNotFoundException("No Profile found by the given Id"));
 		profile.setDescription(profileRequest.getDescription());
 		profile.setCode(profileRequest.getCode());
+		profile.setUpdatedBy(UserSecurityHolder.getUserId());
 		profileRepository.save(profile);
 		return ProfileMapper.toDto(profile);
 	}

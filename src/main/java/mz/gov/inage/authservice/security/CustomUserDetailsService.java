@@ -1,4 +1,4 @@
-package mz.gov.inage.authservice.service;
+package mz.gov.inage.authservice.security;
 
 import mz.gov.inage.authservice.entity.UserEntity;
 import mz.gov.inage.authservice.repository.UserRepository;

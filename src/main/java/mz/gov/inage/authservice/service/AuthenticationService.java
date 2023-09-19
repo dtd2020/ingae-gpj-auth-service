@@ -1,7 +1,7 @@
 package mz.gov.inage.authservice.service;
 
 import lombok.RequiredArgsConstructor;
-import mz.gov.inage.authservice.service.jwt.JwtService;
+import mz.gov.inage.authservice.security.JwtService;
 import mz.gov.inage.authservice.entity.PasswordResetTokenEntity;
 import mz.gov.inage.authservice.repository.PasswordResetTokenRepository;
 import mz.gov.inage.authservice.repository.UserRepository;
@@ -12,6 +12,7 @@ import mz.gov.inage.authservice.exceptions.BusinessException;
 import mz.gov.inage.authservice.exceptions.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -25,7 +26,7 @@ public class AuthenticationService {
 	private final  UserRepository userRepository;
 	private final  JwtService jwtService;
 
-	private final  BCryptPasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
 	private final PasswordResetTokenRepository resetTokenRepository;
 
