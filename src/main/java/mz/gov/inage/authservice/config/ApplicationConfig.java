@@ -1,5 +1,6 @@
-package mz.gov.inage.authservice.security;
+package mz.gov.inage.authservice.config;
 
+import mz.gov.inage.authservice.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

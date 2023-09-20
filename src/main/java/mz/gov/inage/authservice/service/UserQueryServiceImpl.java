@@ -3,6 +3,8 @@ package mz.gov.inage.authservice.service;
 import javax.persistence.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
+import mz.gov.inage.authservice.dto.UserResponseData;
+import mz.gov.inage.authservice.mapper.UserMapper;
 import mz.gov.inage.authservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +16,8 @@ public class UserQueryServiceImpl implements IUserQueryService {
 	private final UserRepository userRepository;
 
 	@Override
-	public UserEntity findByUsername(String username) throws EntityNotFoundException {
-		return this.userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException(String.format("Utilizador  com o nome %s  nao encontrado",username)));
+	public UserResponseData findByUsername(String username) throws EntityNotFoundException {
+		return UserMapper.toDto(this.userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException(String.format("Utilizador  com o nome %s  nao encontrado",username))));
 	}
 
 }

@@ -20,7 +20,9 @@ spring:
       dialect: org.hibernate.dialect.MySQL5Dialect
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   flyway:
     table: auth_flyway_schema_history
     baseline-on-migrate: true

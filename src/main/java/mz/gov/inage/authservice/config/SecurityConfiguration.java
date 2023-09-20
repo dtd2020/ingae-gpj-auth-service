@@ -1,8 +1,10 @@
-package mz.gov.inage.authservice.security;
+package mz.gov.inage.authservice.config;
 
+import mz.gov.inage.authservice.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,10 +30,11 @@ public class SecurityConfiguration  {
 		.csrf()
 		.disable()
 		.authorizeHttpRequests()
-		.antMatchers("/**auth/**").permitAll()
-		.antMatchers("/**swagger-ui/**").permitAll()
+		.antMatchers("/v1/auth-service/swagger-ui/auth/**").permitAll()
+		.antMatchers("/v1/auth-service/swagger-ui/**").permitAll()
+				.antMatchers(HttpMethod.POST,"/v1/auth-service/swagger-ui/users").permitAll()
 		.anyRequest()
-		.authenticated()
+		.permitAll()
 		.and()
 		.sessionManagement()
 		.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

@@ -18,10 +18,6 @@ public class EditUserRequest {
 
 	@NotNull
 	@Size(min = 4,max=100)
-	private String password;
-
-	@NotNull
-	@Size(min = 4,max=100)
 	private String device;
 
 	@NotNull
