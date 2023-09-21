@@ -2,8 +2,6 @@ server:
   port: 8085
   servlet:
     context-path: /v1/auth-service
-    
-    
 spring:
   application:
     name: GPJ-AUTH-SERVICE

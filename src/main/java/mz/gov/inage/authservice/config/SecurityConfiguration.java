@@ -25,24 +25,24 @@ public class SecurityConfiguration  {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		
 		http
-		.csrf()
-		.disable()
-		.authorizeHttpRequests()
-		.antMatchers("/v1/auth-service/swagger-ui/auth/**").permitAll()
-		.antMatchers("/v1/auth-service/swagger-ui/**").permitAll()
-				.antMatchers(HttpMethod.POST,"/v1/auth-service/swagger-ui/users").permitAll()
-		.anyRequest()
-		.permitAll()
-		.and()
-		.sessionManagement()
-		.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		.and()
-		.authenticationProvider(authenticationProvider)
-		.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+				.csrf()
+				.disable()
+				.authorizeHttpRequests()
+				.antMatchers("/v1/auth-service/auth/**").permitAll()
+				.antMatchers("/v1/auth-service/swagger-ui/**").permitAll()
+				.antMatchers(HttpMethod.POST, "/v1/auth-service/users").permitAll()
+				.anyRequest().authenticated()
+				.and()
+				.sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and()
+				.authenticationProvider(authenticationProvider)
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
 		return http.build();
 	}
+
 
 
 
