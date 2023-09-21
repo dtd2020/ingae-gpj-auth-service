@@ -3,6 +3,7 @@ package mz.gov.inage.authservice.user;
 import com.github.javafaker.Faker;
 import mz.gov.inage.authservice.GpjAuthServiceApplication;
 import mz.gov.inage.authservice.dto.CreateUserRequest;
+import mz.gov.inage.authservice.dto.EditProfileRequest;
 import mz.gov.inage.authservice.dto.EditUserRequest;
 import mz.gov.inage.authservice.exceptions.BusinessException;
 import mz.gov.inage.authservice.helpers.TestHelper;
@@ -200,6 +201,82 @@ public class UserServiceTest {
             }
         });
     }
+
+
+    @Test
+    public void testCreateProfile() throws BusinessException {
+        var profileData = UserMockFactory.mockCreateProfileRequest();
+        var profile= userService.createProfile(profileData);
+        assertNotNull(profile);
+        assertNotNull(profile.getId());
+    }
+
+    @Test
+    public void testUpdateProfile() throws BusinessException {
+        var faker=new Faker();
+        var profileData = UserMockFactory.mockCreateProfileRequest();
+        var profile= userService.createProfile(profileData);
+        var newProfileDescription=faker.job().title();
+        assertNotEquals(newProfileDescription,profile.getDescription());
+
+        var editProfileRequest=new EditProfileRequest();
+        editProfileRequest.setDescription(newProfileDescription);
+
+        var newEditedProfile=userService.editProfile(profile.getId(),editProfileRequest);
+        assertNotNull(newEditedProfile);
+        assertNotNull(newEditedProfile.getId());
+        assertEquals(newEditedProfile.getDescription(),editProfileRequest.getDescription());
+    }
+
+
+    @Test
+    public void testDeleteProfile() throws BusinessException {
+        var profileData = UserMockFactory.mockCreateProfileRequest();
+        var profile= userService.createProfile(profileData);
+
+        assertNotNull(profile);
+        assertNotNull(profile.getId());
+        userService.deleteProfile(profile.getId());
+        assertThrows(EntityNotFoundException.class, () -> {
+            try {
+                userService.deleteProfile(profile.getId());
+            } catch (EntityNotFoundException e) {
+                assertEquals("No Profile found by the given Id", e.getMessage());
+                throw e;
+            }
+        });
+
+    }
+    @Test
+    public void testFailUpdateProfileNotFound() throws BusinessException {
+
+        var editProfileRequest=new EditProfileRequest();
+        editProfileRequest.setDescription("will not update");
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            try {
+                userService.editProfile(Long.MAX_VALUE,editProfileRequest);
+            } catch (EntityNotFoundException e) {
+                assertEquals("No Profile found by the given Id", e.getMessage());
+                throw e;
+            }
+        });
+
+    }
+
+    @Test
+    public void testFailDeleteProfileNotFound() throws BusinessException {
+        assertThrows(EntityNotFoundException.class, () -> {
+            try {
+                userService.deleteProfile(Long.MAX_VALUE);
+            } catch (EntityNotFoundException e) {
+                assertEquals("No Profile found by the given Id", e.getMessage());
+                throw e;
+            }
+        });
+
+    }
+
 
 
 }

@@ -18,11 +18,8 @@ import javax.persistence.Table;
 @Table(name = "USER_PERMISSION")
 public class UserPermissionEntity extends LifeCycleEntity{
 
-    @Column(name = "PERMISSION_ID", nullable = false)
-    private Long permissionId;
-
-    @JoinColumn(name = "PERMISSION_ID", insertable = false,updatable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PERMISSION_ID")
+    @ManyToOne(fetch = FetchType.EAGER)
     private PermissionEntity permission;
 
     @Column(name = "USER_ID", nullable = false)

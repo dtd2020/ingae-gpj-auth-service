@@ -26,18 +26,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        // Load user profiles (roles) from USER_PROFILE table
-        var userProfiles = userEntity.getRoles();
-
-        // Map profiles to GrantedAuthority
-        Set<GrantedAuthority> authorities = userProfiles.stream()
-                .map(profile -> new SimpleGrantedAuthority(profile.getCode()))
-                .collect(Collectors.toSet());
-
         return new org.springframework.security.core.userdetails.User(
                 userEntity.getUsername(),
                 userEntity.getPassword(),
-                authorities
+                userEntity.getAuthorities()
         );
     }
 

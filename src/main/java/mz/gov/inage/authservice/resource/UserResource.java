@@ -97,7 +97,7 @@ public class UserResource {
 			@ApiResponse(code = 400, message = "Invalid profile data")
 	})
 	@PostMapping("/{userId}/profile/create")
-	public ResponseEntity<ProfileResponseData> createProfile(@PathVariable Long userId, @Valid @RequestBody CreateProfileRequest profileRequest) {
+	public ResponseEntity<ProfileResponseData> createProfile(@Valid @RequestBody CreateProfileRequest profileRequest) {
 		ProfileResponseData profileData = userService.createProfile(profileRequest);
 		return ResponseEntity.ok(profileData);
 	}

@@ -6,6 +6,7 @@ import mz.gov.inage.authservice.entity.UserEntity;
 import mz.gov.inage.authservice.entity.UserPermissionEntity;
 import mz.gov.inage.authservice.mapper.ProfileMapper;
 import mz.gov.inage.authservice.mapper.UserMapper;
+import mz.gov.inage.authservice.repository.PermissionRepository;
 import mz.gov.inage.authservice.repository.ProfileRepository;
 import mz.gov.inage.authservice.repository.UserRepository;
 import mz.gov.inage.authservice.dto.CreateProfileRequest;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +34,10 @@ public class UserServiceImpl implements IUserService {
 
 	private final PasswordEncoder passwordEncoder;
 
+	private final PermissionRepository permissionRepository;
+
 	@Override
-	public UserResponseData createUser(CreateUserRequest userRequest) throws BusinessException {
+	public UserResponseData createUser(@Valid  CreateUserRequest userRequest) throws BusinessException {
 
 		userValidator.validateCreateUser(userRequest);
 
@@ -42,21 +46,26 @@ public class UserServiceImpl implements IUserService {
 		user.setPassword(hashedPassword);
 		user.setCreatedBy(UserSecurityHolder.getUserId());
 		userRepository.save(user);
-		if(userRequest.getPermissions()!=null && !userRequest.getPermissions().isEmpty()){
-			userRequest.getPermissions().stream().forEach(permissionId->{
-				UserPermissionEntity userPermissionEntity=new UserPermissionEntity();
-				userPermissionEntity.setUser(user);
-				userPermissionEntity.setPermissionId(permissionId);
-			});
-		}
+		addPermissions(userRequest, user);
 
 		return UserMapper.toDto(user);
 	}
 
+	private  void addPermissions(CreateUserRequest userRequest, UserEntity user) {
+		if(userRequest.getPermissions()!=null && !userRequest.getPermissions().isEmpty()){
+			userRequest.getPermissions().stream().forEach(permissionId->{
+				var permission=permissionRepository.findById(permissionId)
+						.orElseThrow(()->new EntityNotFoundException("No permission found by the given Id"));
+				UserPermissionEntity userPermissionEntity=new UserPermissionEntity();
+				userPermissionEntity.setUser(user);
+				userPermissionEntity.setPermission(permission);
+			});
+		}
+	}
 
 
 	@Override
-	public UserResponseData updateUser(Long userId, EditUserRequest userRequest) throws BusinessException {
+	public UserResponseData updateUser(Long userId, @Valid  EditUserRequest userRequest) throws BusinessException {
 		userValidator.validateUpdateUser(userRequest);
 		var user =userRepository.findById(userId)
 				.orElseThrow(()->new EntityNotFoundException("No user found by the given Id"));
@@ -83,7 +92,7 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public ProfileResponseData createProfile(CreateProfileRequest profileRequest) throws BusinessException {
+	public ProfileResponseData createProfile(@Valid CreateProfileRequest profileRequest) throws BusinessException {
 		ProfileEntity profileEntity= new ProfileEntity();
 		profileEntity.setCode(profileRequest.getCode());
 		profileEntity.setDescription(profileRequest.getDescription());
@@ -94,11 +103,10 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public ProfileResponseData editProfile(Long profileId, EditProfileRequest profileRequest) throws BusinessException {
+	public ProfileResponseData editProfile(Long profileId, @Valid EditProfileRequest profileRequest) throws BusinessException {
 		var profile=profileRepository.findById(profileId)
 				.orElseThrow(()->new EntityNotFoundException("No Profile found by the given Id"));
-		profile.setDescription(profileRequest.getDescription());
-		profile.setCode(profileRequest.getCode());
+		profile.update(profileRequest);
 		profile.setUpdatedBy(UserSecurityHolder.getUserId());
 		profileRepository.save(profile);
 		return ProfileMapper.toDto(profile);

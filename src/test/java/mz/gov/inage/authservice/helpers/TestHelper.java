@@ -29,6 +29,7 @@ public class TestHelper {
         var profile =profileRepository.findByCode(UserMockFactory.PROFILE_CODE);
         if(!profile.isPresent()  ){
              var profileData = UserMockFactory.mockCreateProfileRequest();
+             profileData.setCode(UserMockFactory.PROFILE_CODE);
             return userService.createProfile(profileData);
         }
         else{

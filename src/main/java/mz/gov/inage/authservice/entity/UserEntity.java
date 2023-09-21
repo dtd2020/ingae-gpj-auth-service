@@ -57,8 +57,6 @@ public class UserEntity extends LifeCycleEntity implements UserDetails {
 	private LocalDateTime passwordExpirationDate;
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-	@Getter(value=AccessLevel.NONE)
-	@Setter(value= AccessLevel.NONE)
 	private Set<UserProfileEntity> roles;
 
 	@Override
@@ -71,16 +69,13 @@ public class UserEntity extends LifeCycleEntity implements UserDetails {
 		return this.password;
 	}
 
-	public Set<ProfileEntity> getRoles() {
-		return roles.stream()
-				.map(UserProfileEntity::getProfile)
-				.collect(Collectors.toSet());
-	}
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+	private Set<UserPermissionEntity> permissions;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return roles.stream()
-				.map(role -> new SimpleGrantedAuthority("ROLE_" + role.getProfile().getCode()))
+		return permissions.stream()
+				.map(role -> new SimpleGrantedAuthority( role.getPermission().getCode()))
 				.collect(Collectors.toList());
 	}
 
