@@ -7,10 +7,13 @@ import mz.gov.inage.authservice.dto.UserResponseData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.HashSet;
+import java.util.stream.Collectors;
+
 
 public class UserMapper {
     public static UserResponseData toDto(UserEntity entity){
-       return  UserResponseData.builder()
+     return  UserResponseData.builder()
                .id(entity.getId())
                .email(entity.getEmail())
                .active(entity.isActive())
@@ -19,7 +22,14 @@ public class UserMapper {
                .lastLoggedIn(entity.getLastLoggedIn())
                .username(entity.getUsername())
                .name(entity.getName())
+               .permissions(entity.getPermissions()==null?new HashSet<>():entity.getPermissions().stream()
+                       .map(userPermission->PermissionMapper
+                               .toDto(userPermission.getPermission())).collect(Collectors.toSet()))
+               .profiles(entity.getRoles()==null?new HashSet<>():entity.getRoles().stream()
+                       .map(userProfile->ProfileMapper.toDto(userProfile.getProfile()))
+                       .collect(Collectors.toSet()))
                .build();
+
     }
 
 

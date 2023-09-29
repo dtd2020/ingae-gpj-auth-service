@@ -18,8 +18,10 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -57,7 +59,7 @@ public class UserEntity extends LifeCycleEntity implements UserDetails {
 	private LocalDateTime passwordExpirationDate;
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-	private Set<UserProfileEntity> roles;
+	private Set<UserProfileEntity> roles=new HashSet<>();;
 
 	@Override
 	public String getUsername(){
@@ -70,7 +72,7 @@ public class UserEntity extends LifeCycleEntity implements UserDetails {
 	}
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-	private Set<UserPermissionEntity> permissions;
+	private Set<UserPermissionEntity> permissions=new HashSet<>();
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -52,7 +52,7 @@ public final class UserMockFactory {
     public static CreateProfileRequest mockCreateProfileRequest() {
         Faker faker = new Faker();
         var profile= new CreateProfileRequest();
-        profile.setCode(faker.job().title().replaceAll("\\s", "").substring(0,10));
+        profile.setCode(faker.name().fullName().replaceAll("\\s", "").substring(0,10));
         profile.setDescription(faker.job().title());
         return profile;
     }

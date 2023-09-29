@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -29,39 +31,8 @@ public class UserResponseData {
 
 	private LocalDateTime lastLoggedIn;
 
-	public Long getId() {
-		return id;
-	}
+	private Set<ProfileResponseData> profiles;
 
-	public String getUsername() {
-		return username;
-	}
+	private Set<PermissionResponseData> permissions;
 
-	public String getName() {
-		return name;
-	}
-
-	public String getDevice() {
-		return device;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public String getMobile() {
-		return mobile;
-	}
-
-	public Long getCreatedBy() {
-		return createdBy;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public LocalDateTime getLastLoggedIn() {
-		return lastLoggedIn;
-	}
 }
