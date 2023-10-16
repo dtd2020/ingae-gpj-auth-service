@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetTokenEntity, Long> {
 
-    @Query(value = "select p.* from PASSWORD_RESET_TOKEN p where  p.user_id = :userId and p.expiration_date_time > now() order by id desc limit 1 ",nativeQuery = true)
-    Optional<PasswordResetTokenEntity> findLastUnexpiredTokenByUser(@Param("userId") final Long userId);
+    @Query(value = "select p.* from PASSWORD_RESET_TOKEN p where  p.user_id = :userId and p.token = :token  ",nativeQuery = true)
+    Optional<PasswordResetTokenEntity> findTokenByUser(@Param("userId") final Long userId,@Param("token") final String token);
 
 }

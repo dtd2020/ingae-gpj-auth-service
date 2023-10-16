@@ -11,6 +11,8 @@ import mz.gov.inage.authservice.mapper.ProfileMapper;
 import mz.gov.inage.authservice.mapper.UserMapper;
 import mz.gov.inage.authservice.repository.PermissionRepository;
 import mz.gov.inage.authservice.repository.ProfileRepository;
+import mz.gov.inage.authservice.repository.UserPermissionRepository;
+import mz.gov.inage.authservice.repository.UserProfileRepository;
 import mz.gov.inage.authservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +30,18 @@ public class UserQueryServiceImpl implements IUserQueryService {
 
 	private final PermissionRepository permissionRepository;
 
+	private final UserPermissionRepository userPermissionRepository;
+
+	private final UserProfileRepository userProfileRepository;
+
 	@Override
 	public UserResponseData findByUsername(String username) throws EntityNotFoundException {
-		return UserMapper.toDto(this.userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException(String.format("Utilizador  com o nome %s  nao encontrado",username))));
+
+		var user =this.userRepository.findByUsername(username).orElseThrow(() ->
+				new EntityNotFoundException(String.format("User with the following username %s  was not found",username)));
+		user.setPermissions(userPermissionRepository.findByUserId(user.getId()));
+		user.setRoles(userProfileRepository.findByUserId(user.getId()));
+		return UserMapper.toDto(user);
 	}
 
 	@Override
@@ -43,6 +54,15 @@ public class UserQueryServiceImpl implements IUserQueryService {
 	public Set<PermissionResponseData> findAllPermissions() {
 		return permissionRepository.findAll().stream().map(
 				PermissionMapper::toDto).collect(Collectors.toSet());
+	}
+
+	@Override
+	public UserEntity findById(Long id) throws EntityNotFoundException {
+		var user =this.userRepository.findById(id).orElseThrow(() ->
+				new EntityNotFoundException(String.format("User with the following id %s  was not found",id+"")));
+		user.setPermissions(userPermissionRepository.findByUserId(user.getId()));
+		user.setRoles(userProfileRepository.findByUserId(user.getId()));
+		return user;
 	}
 
 }

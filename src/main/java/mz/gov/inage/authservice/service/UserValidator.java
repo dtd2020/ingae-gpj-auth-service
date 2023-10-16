@@ -15,13 +15,9 @@ public class UserValidator {
 
     private final UserRepository userRepository;
     public  void validateCreateUser(CreateUserRequest userRequest) {
-        if(userRequest.getProfileId()==null){
-            throw  new BusinessException("Profile should not be null");
-        }
         if(userRepository.findByUsername(userRequest.getUsername()).isPresent()){
             throw  new BusinessException("User with the provided username already exists");
         }
-
     }
 
     public void validateUpdateUser(EditUserRequest userRequest) {

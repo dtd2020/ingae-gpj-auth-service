@@ -57,7 +57,6 @@ public class TestHelper {
             return UserMapper.toDto(user.get());
         }
         else{
-            createUserRequest.setProfileId(createOrFindProfile().getId());
             createUserRequest.setUsername(UserMockFactory.DEFAULT_USERNAME);
             return userService.createUser(createUserRequest);
         }

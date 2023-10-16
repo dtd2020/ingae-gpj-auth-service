@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import mz.gov.inage.authservice.dto.AuthenticationResponseData;
 import mz.gov.inage.authservice.dto.ChangePasswordRequest;
 import mz.gov.inage.authservice.dto.RegisterRequest;
+import mz.gov.inage.authservice.dto.ResetPasswordRequest;
 import mz.gov.inage.authservice.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,6 +64,18 @@ public class AuthResource {
 			@ApiParam(value = "userId", required = true)
 			@RequestParam("userId") Long userId) {
 		authService.requestResetPassword(userId);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("/reset-password")
+	@ApiOperation(value = "Reset Password ", notes = "Reset for a user.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 204, message = "Password reset successfully")
+	})
+	public ResponseEntity<Void> resetPassword(
+			@ApiParam(value = "userId", required = true)
+			@RequestParam("userId") Long userId, @RequestBody ResetPasswordRequest resetPasswordRequest) {
+		authService.resetPassword(userId,resetPasswordRequest);
 		return ResponseEntity.noContent().build();
 	}
 }

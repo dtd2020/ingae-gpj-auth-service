@@ -1,10 +1,15 @@
 package mz.gov.inage.authservice.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import mz.gov.inage.authservice.dto.UserResponseData;
+import mz.gov.inage.authservice.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -21,24 +26,30 @@ public class JwtService {
 	@Value("${jwt.secret.key}")
 	private  String jwtSecretKey;
 
-	public String generateToken(UserDetails userDetails) {
-		return this.generateToken(new HashMap<>(), userDetails);
+	public String generateToken(UserResponseData userResponseData) {
+		Map<String, Object> claims = new HashMap<>();
+		ObjectMapper objectMapper = new ObjectMapper();
+		claims.put("sub", userResponseData.getUsername());
+		try {
+			claims.put("user", objectMapper.writeValueAsString(userResponseData));
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+		return this.generateToken(claims, userResponseData);
+
 	}
 	
-	public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-		return Jwts
-				.builder()
+	public String generateToken(Map<String, Object> extraClaims, UserResponseData userResponseData) {
+		return Jwts.builder()
 				.setClaims(extraClaims)
-				.setSubject(userDetails.getUsername())
+				.setSubject(userResponseData.getUsername())
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
-				.signWith(getSignKey(), SignatureAlgorithm.HS256)
+				.signWith(SignatureAlgorithm.HS256,getSignKey())
 				.compact();
 	}
 	
-	
-	
-	
+
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
 	}
@@ -66,6 +77,7 @@ public class JwtService {
 	private Claims extractAllClaims(String token) {
 		return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
 	}
+
 
 	private Key getSignKey() {
 		byte[] keyBytes = Decoders.BASE64.decode(jwtSecretKey);

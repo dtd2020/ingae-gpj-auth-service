@@ -58,8 +58,7 @@ public class UserEntity extends LifeCycleEntity implements UserDetails {
 	@Column(name = "PASSWORD_EXPIRATION_DATE")
 	private LocalDateTime passwordExpirationDate;
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-	private Set<UserProfileEntity> roles=new HashSet<>();;
+	private transient Set<UserProfileEntity> roles=new HashSet<>();;
 
 	@Override
 	public String getUsername(){
@@ -71,8 +70,7 @@ public class UserEntity extends LifeCycleEntity implements UserDetails {
 		return this.password;
 	}
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-	private Set<UserPermissionEntity> permissions=new HashSet<>();
+	private transient  Set<UserPermissionEntity> permissions=new HashSet<>();
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -44,8 +44,6 @@ public class UserServiceTest {
 
         CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
         var profile=testHelper.createOrFindProfile();
-        createUserRequest.setProfileId(profile.getId());
-        assertNotNull(profile.getId());
        var userResponseData= userService.createUser(createUserRequest);
         var user=userRepository.findByUsername(userResponseData.getUsername())
                         .get();
@@ -58,26 +56,12 @@ public class UserServiceTest {
 
     }
 
-    @Test
-    public void testFailCreateUserNoProfileProvided() {
-        assertThrows(BusinessException.class, () -> {
-            try {
-                CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
-                userService.createUser(createUserRequest);
-            } catch (BusinessException e) {
-                assertEquals("Profile should not be null", e.getMessage());
-                throw e;
-            }
-        });
-    }
-
 
     @Test
     public void testFailCreateUserExistingUsername() {
         assertThrows(BusinessException.class, () -> {
             try {
                 CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
-                createUserRequest.setProfileId(testHelper.createOrFindProfile().getId());
                 userService.createUser(createUserRequest);
                 userService.createUser(createUserRequest);
 
@@ -99,7 +83,6 @@ public class UserServiceTest {
         var permissionIds=new HashSet<Long>();
         permissionIds.add(permission.getId());
         createUserRequest.setPermissions(permissionIds);
-        createUserRequest.setProfileId(testHelper.createOrFindProfile().getId());
         var userResponseData= userService.createUser(createUserRequest);
         var user=userRepository.findByUsername(userResponseData.getUsername())
                 .get();
@@ -145,7 +128,6 @@ public class UserServiceTest {
     @Test
     public void testInactivateUser() throws BusinessException {
         CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
-        createUserRequest.setProfileId(testHelper.createOrFindProfile().getId());
         var userResponseData= userService.createUser(createUserRequest);
         var user=userRepository.findByUsername(userResponseData.getUsername())
                 .get();
@@ -176,7 +158,6 @@ public class UserServiceTest {
     @Test
     public void testDeleteUser() throws BusinessException {
         CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
-        createUserRequest.setProfileId(testHelper.createOrFindProfile().getId());
         var userResponseData= userService.createUser(createUserRequest);
         var user=userRepository.findByUsername(userResponseData.getUsername())
                 .get();

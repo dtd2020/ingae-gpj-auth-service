@@ -7,7 +7,8 @@ public class UserSecurityHolder {
     public static Long  getUserId() {
        var authentication= SecurityContextHolder.getContext()
                 .getAuthentication();
-        if(authentication!=null && authentication.isAuthenticated()){
+        if(authentication!=null && authentication.isAuthenticated()
+                && !authentication.getPrincipal().equals("anonymousUser")){
             String userId = (String) SecurityContextHolder.getContext()
                     .getAuthentication().getPrincipal();
 

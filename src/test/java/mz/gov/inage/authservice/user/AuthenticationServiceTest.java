@@ -98,20 +98,9 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testRequestResetPassword() throws BusinessException {
-        var user=testHelper.createOrFindUser();
-        authenticationService.requestResetPassword(user.getId());
-        var resetPassword= resetTokenRepository.findLastUnexpiredTokenByUser(user.getId());
-        assertTrue(resetPassword.isPresent());
-        assertNotNull(resetPassword.get().getToken());
-        assertFalse(resetPassword.get().isExpired());
-    }
-
-    @Test
     public void testChangePassword() throws BusinessException {
         CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
         var profile=testHelper.createOrFindProfile();
-        createUserRequest.setProfileId(profile.getId());
         assertNotNull(profile.getId());
         var userResponseData= userService.createUser(createUserRequest);
         var user=userRepository.findById(userResponseData.getId()).get();
@@ -146,44 +135,10 @@ public class AuthenticationServiceTest {
         assertNotNull(token);
     }
 
-
-    @Test
-    public void testFailChangePasswordInvalidOrExpiredToken() throws BusinessException {
-        CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
-        var profile=testHelper.createOrFindProfile();
-        createUserRequest.setProfileId(profile.getId());
-        assertNotNull(profile.getId());
-        var userResponseData= userService.createUser(createUserRequest);
-        var user=userRepository.findById(userResponseData.getId()).get();
-
-        //Preparing to change the password
-        var changePasswordRequest=new ChangePasswordRequest();
-        changePasswordRequest.setCurrentPassword(UserMockFactory.DEFAULT_PASSWORD);
-        changePasswordRequest.setNewPassword("InageM.20232@");
-
-        //Old Password
-        assertTrue(passwordEncoder.matches(UserMockFactory.DEFAULT_PASSWORD,user.getPassword()));
-
-        assertThrows(BusinessException.class, () -> {
-            try {
-                authenticationService.changePassword(userResponseData.getId(),changePasswordRequest);
-            } catch (BusinessException e) {
-                assertEquals("Invalid or expired token.", e.getMessage());
-                throw e;
-            }
-        });
-
-        //Still the same old Password. So nothing changed
-        assertTrue(passwordEncoder.matches(UserMockFactory.DEFAULT_PASSWORD,user.getPassword()));
-
-    }
-
-
     @Test
     public void testFailChangePasswordCurrentPasswordIsIncorrect() throws BusinessException {
         CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
         var profile=testHelper.createOrFindProfile();
-        createUserRequest.setProfileId(profile.getId());
         assertNotNull(profile.getId());
         var userResponseData= userService.createUser(createUserRequest);
         var user=userRepository.findById(userResponseData.getId()).get();
@@ -218,7 +173,6 @@ public class AuthenticationServiceTest {
     public void testFailChangePasswordInvalidFormat() throws BusinessException {
         CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
         var profile=testHelper.createOrFindProfile();
-        createUserRequest.setProfileId(profile.getId());
         assertNotNull(profile.getId());
         var userResponseData= userService.createUser(createUserRequest);
         var user=userRepository.findById(userResponseData.getId()).get();
@@ -253,7 +207,6 @@ public class AuthenticationServiceTest {
     public void testFailChangePasswordSamePasswordAsPrevious() throws BusinessException {
         CreateUserRequest createUserRequest = UserMockFactory.mockCreateUserRequest();
         var profile=testHelper.createOrFindProfile();
-        createUserRequest.setProfileId(profile.getId());
         assertNotNull(profile.getId());
         var userResponseData= userService.createUser(createUserRequest);
         var user=userRepository.findById(userResponseData.getId()).get();
