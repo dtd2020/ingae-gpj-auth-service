@@ -1,6 +1,11 @@
 package mz.gov.inage.authservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import mz.gov.inage.authservice.dto.ResetPasswordRequest;
+import mz.gov.inage.authservice.mapper.UserMapper;
+import mz.gov.inage.authservice.repository.UserPermissionRepository;
+import mz.gov.inage.authservice.repository.UserProfileRepository;
 import mz.gov.inage.authservice.security.JwtService;
 import mz.gov.inage.authservice.entity.PasswordResetTokenEntity;
 import mz.gov.inage.authservice.repository.PasswordResetTokenRepository;
@@ -24,11 +29,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthenticationService {
 	private final  UserRepository userRepository;
+
 	private final  JwtService jwtService;
 
 	private final PasswordEncoder passwordEncoder;
 
 	private final PasswordResetTokenRepository resetTokenRepository;
+
+	private final UserPermissionRepository userPermissionRepository;
+
+	private final UserProfileRepository userProfileRepository;
 
 	@Value("${maximum.token.expiration}")
 	private Integer maximumTokenExpiration;
@@ -36,6 +46,7 @@ public class AuthenticationService {
 	public AuthenticationResponseData authenticate(RegisterRequest request) {
 
 		var userEntityOptional = this.userRepository.findByUsername(request.getUsername());
+
 		if(!userEntityOptional.isPresent()){
 			throw new UnauthorizedException("Username or Password are incorrect");
 		}
@@ -45,7 +56,10 @@ public class AuthenticationService {
 			throw new UnauthorizedException("Username or Password are incorrect");
 		}
 
-		String jwtToken = jwtService.generateToken(userEntityOptional.get());
+		var user = userEntityOptional.get();
+		user.setPermissions(userPermissionRepository.findByUserId(user.getId()));
+		user.setRoles(userProfileRepository.findByUserId(user.getId()));
+		String jwtToken = jwtService.generateToken(UserMapper.toDto(user));
 		AuthenticationResponseData authenticationResponse = new AuthenticationResponseData();
 		authenticationResponse.setToken(jwtToken);
 		return authenticationResponse;
@@ -54,11 +68,6 @@ public class AuthenticationService {
 	public void changePassword(final Long userId, final ChangePasswordRequest changePasswordRequest) {
 
 		var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-		// Validate the reset token
-		if (!resetTokenRepository.findLastUnexpiredTokenByUser(userId).isPresent()) {
-			throw  new BusinessException("Invalid or expired token.");
-		}
 
 		// Validate if the current password matches
 		if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())) {
@@ -109,4 +118,25 @@ public class AuthenticationService {
 		return UUID.randomUUID().toString();
 	}
 
+	public void resetPassword(final Long userId, final ResetPasswordRequest resetPasswordRequest) {
+
+		var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+		// Validate the reset token
+		var token = resetTokenRepository.findTokenByUser(userId,resetPasswordRequest.getResetToken())
+				.orElseThrow(()-> new mz.gov.inage.authservice.exceptions.EntityNotFoundException("Token Not found"));
+
+		if (token.isExpired()) {
+			throw  new BusinessException("Invalid or expired token.");
+		}
+
+		// Validate the new password
+		if (!isValidPassword(resetPasswordRequest.getNewPassword())) {
+			throw new BusinessException("Invalid password format");
+		}
+		// Encode and set the new password
+		String encodedPassword = passwordEncoder.encode(resetPasswordRequest.getNewPassword());
+		user.setPassword(encodedPassword);
+		userRepository.save(user);
+	}
 }

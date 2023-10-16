@@ -37,6 +37,7 @@ public class CreateUserRequest {
 	private Set<Long> permissions;
 
 	@NotNull
-	private Long profileId;
+	@Size(min = 1,max = 100)
+	private Set<Long>  profileIds;
 
 }

@@ -15,4 +15,6 @@ public interface IUserQueryService {
 	Set<ProfileResponseData> findAllProfiles();
 
 	Set<PermissionResponseData> findAllPermissions();
+
+	UserEntity findById(final Long id) throws EntityNotFoundException;
 }

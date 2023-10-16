@@ -33,9 +33,10 @@ public class EditUserRequest {
 
 	@NotNull
 	@Size(min = 1,max = 100)
-	private Set<CreatePermissionRequest> permissions;
+	private Set<Long> permissions;
 
 	@NotNull
-	private CreateProfileRequest profile;
+	@Size(min = 1,max = 100)
+	private Set<Long>  profileIds;
 
 }
